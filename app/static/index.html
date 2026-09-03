@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRM Pipeline Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+    <div class="max-w-6xl mx-auto p-6">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Deep Learning Super-Resolution Mapping (SRM)</h1>
+            <p class="text-gray-600 mt-2">Upload a 4-band Sentinel-2 TIFF image (30m or 10m) to generate a 10m Land-Cover Classification Map.</p>
+        </header>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4">Upload Image</h2>
+            <form id="uploadForm" class="flex items-center space-x-4">
+                <input type="file" id="fileInput" accept=".tif,.tiff" class="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100" required />
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md font-medium hover:bg-blue-700 transition">Analyze</button>
+            </form>
+            <div id="loading" class="hidden flex items-center space-x-3 mt-4 text-blue-600">
+                <div class="loader"></div>
+                <span>Processing model...</span>
+            </div>
+            <div id="errorMsg" class="hidden mt-4 text-red-600 font-medium"></div>
+        </div>
+
+        <div id="results" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Input RGB -->
+                <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <h3 class="text-lg font-semibold mb-2">Input Image (RGB)</h3>
+                    <img id="inputImg" src="" alt="Input RGB" class="max-w-full h-auto rounded border border-gray-200" style="image-rendering: pixelated;" />
+                </div>
+                <!-- Prediction -->
+                <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <h3 class="text-lg font-semibold mb-2">10m Predicted Land-Cover</h3>
+                    <img id="predImg" src="" alt="Prediction" class="max-w-full h-auto rounded border border-gray-200" style="image-rendering: pixelated;" />
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+                <h3 class="text-lg font-semibold mb-4">Legend</h3>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center"><div class="w-6 h-6 bg-[rgb(0,0,255)] mr-2 rounded"></div><span>Water</span></div>
+                    <div class="flex items-center"><div class="w-6 h-6 bg-[rgb(255,0,0)] mr-2 rounded"></div><span>Built-up</span></div>
+                    <div class="flex items-center"><div class="w-6 h-6 bg-[rgb(0,128,0)] mr-2 rounded"></div><span>Vegetation</span></div>
+                    <div class="flex items-center"><div class="w-6 h-6 bg-[rgb(255,255,0)] mr-2 rounded"></div><span>Cropland</span></div>
+                    <div class="flex items-center"><div class="w-6 h-6 bg-[rgb(165,42,42)] mr-2 rounded"></div><span>Bare Land</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) return;
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Error processing image. Make sure it's a valid 4-band TIFF.");
+                }
+                
+                const data = await response.json();
+                
+                document.getElementById('inputImg').src = data.input_image;
+                document.getElementById('predImg').src = data.prediction_image;
+                
+                document.getElementById('results').classList.remove('hidden');
+            } catch (err) {
+                const errMsg = document.getElementById('errorMsg');
+                errMsg.textContent = err.message;
+                errMsg.classList.remove('hidden');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

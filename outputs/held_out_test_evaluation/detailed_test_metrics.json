@@ -1,0 +1,56 @@
+{
+  "split": "test",
+  "test_patches": 36,
+  "overall_accuracy": 0.582811897183642,
+  "per_class_accuracy": {
+    "Water": 0.8958797327394209,
+    "Built-up": 0.7983095307490528,
+    "Vegetation": 0.6318812239724787,
+    "Cropland": 0.5185331157434492,
+    "Bare Land": 0.20570597855715064
+  },
+  "confusion_matrix_rows_true_columns_predicted": [
+    [
+      1609,
+      43,
+      38,
+      44,
+      62
+    ],
+    [
+      144,
+      19173,
+      1023,
+      1572,
+      2105
+    ],
+    [
+      5205,
+      16701,
+      87247,
+      23071,
+      5851
+    ],
+    [
+      399,
+      21953,
+      45174,
+      84202,
+      10657
+    ],
+    [
+      950,
+      2172,
+      233,
+      1016,
+      1132
+    ]
+  ],
+  "hard_prediction_30m_composition_mae": 0.16403477328519026,
+  "first_three_patch_composition_mae": [
+    0.18194444477558136,
+    0.16180554032325745,
+    0.10390625149011612
+  ],
+  "note": "30 m Sentinel-2 input is spectral imagery, not a class map. Composition agreement is therefore calculated against 30 m class fractions derived from the held-out 10 m WorldCover labels."
+}
