@@ -1,12 +1,73 @@
 @import "tailwindcss";
 
 @theme {
-  --color-neon: #39ff14;
-  --color-dark: #121212;
-  --color-darker: #0a0a0a;
+  --color-background: #0b1215;
+  --color-surface: #142229;
+  --color-text-primary: #f0fdf4;
+  --color-text-secondary: #94b2bf;
+  --color-primary: #10b981;
+  --color-primary-foreground: #022c22;
+  --color-secondary: #06b6d4;
+  --color-accent: #34d399;
+  --color-border: #23414e;
+  --color-success: #10b981;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+
+  /* Backward compatibility aliases */
+  --color-neon: #10b981;
+  --color-dark: #142229;
+  --color-darker: #0b1215;
 }
 
 body {
-  background-color: var(--color-dark);
-  color: #fff;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -24px;
+  z-index: -1;
+  background-image: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.65)),
+    url('./assets/react.svg');
+  background-size: cover;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  animation: kenBurns 48s ease-in-out infinite alternate;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.06) translate(-14px, -10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    transform: none;
+  }
+}
+
+#root > div {
+  background-color: transparent !important;
+}
+
+/* Solid near-dark background ONLY behind the card container so text stays fully readable */
+main {
+  background-color: rgba(17, 28, 34, 0.96) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+

@@ -7,7 +7,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/predict': 'http://localhost:8000'
+      '/predict': 'http://localhost:8000',
+      '/samples': 'http://localhost:8000',
+      '/predict_sample': 'http://localhost:8000'
     }
   }
 })
